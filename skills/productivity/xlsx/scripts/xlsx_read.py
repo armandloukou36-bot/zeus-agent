@@ -156,5 +156,5 @@ if __name__ == "__main__":
     try:
         sys.exit(main())
     except Exception as exc:  # noqa: BLE001
-        print(json.dumps({"ok": False, "error": str(exc)}), file=sys.stderr)
+        print(json.dumps({"ok": False, "error": "An unexpected error occurred."}), file=sys.stderr)
         sys.exit(1)
