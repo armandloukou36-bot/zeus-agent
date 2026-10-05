@@ -18,14 +18,56 @@ Exit codes: 0 recovered, 1 nothing worked, 2 bad invocation.
 from __future__ import annotations
 
 import argparse
+import ipaddress
 import json
 import os
 import re
+import socket
 import sys
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
+
+
+def _validate_url_safety(url: str):
+    """Raise URLError for non-HTTP/S URLs or those resolving to private IPs."""
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme not in ("http", "https"):
+        raise urllib.error.URLError(f"URL scheme '{parsed.scheme}' is not allowed.")
+    if not parsed.hostname:
+        raise urllib.error.URLError("URL is missing a hostname.")
+    try:
+        # getaddrinfo returns a list of 5-tuples; the fifth element is a
+        # (host, port) tuple. We just want the host.
+        # Using AF_UNSPEC to be family-agnostic (IPv4/IPv6).
+        addr_info = socket.getaddrinfo(
+            parsed.hostname, parsed.port, family=socket.AF_UNSPEC
+        )
+        for info in addr_info:
+            ip_addr = ipaddress.ip_address(info[4][0])
+            if ip_addr.is_private or ip_addr.is_loopback or ip_addr.is_link_local:
+                raise urllib.error.URLError(f"Request to private IP {ip_addr} blocked.")
+    except (socket.gaierror, ValueError, IndexError) as exc:
+        raise urllib.error.URLError(f"Could not resolve/validate host {parsed.hostname!r}") from exc
+
+
+class _SafeRedirectHandler(urllib.request.HTTPRedirectHandler):
+    """Prevent redirects to non-HTTP/S, and to private/reserved IP ranges."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        try:
+            _validate_url_safety(newurl)
+        except urllib.error.URLError as exc:
+            # Raise a new error with a more redirect-specific message
+            raise urllib.error.URLError(f"Blocked unsafe redirect to {newurl!r}: {exc.reason}") from exc
+
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+# Install the safe handler for all subsequent urlopen calls.
+urllib.request.install_opener(urllib.request.build_opener(_SafeRedirectHandler))
+
 
 USER_AGENT = (
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
@@ -60,6 +102,10 @@ def _fetch(
     headers: dict | None = None,
     retries_on_429: int = 2,
 ) -> tuple[int, bytes]:
+    try:
+        _validate_url_safety(url)
+    except urllib.error.URLError:
+        return 0, b""
     req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT, **(headers or {})})
     for attempt in range(retries_on_429 + 1):
         try:
@@ -77,6 +123,10 @@ def _fetch(
 
 def _fetch_follow(url: str, timeout: int) -> tuple[int, bytes, str]:
     """Like _fetch but also returns the final URL after redirects."""
+    try:
+        _validate_url_safety(url)
+    except urllib.error.URLError:
+        return 0, b"", url
     req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     try:
         with urllib.request.urlopen(req, timeout=timeout) as resp:
