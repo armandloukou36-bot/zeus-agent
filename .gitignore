@@ -1,20 +1,20 @@
 # =============================================================================
 # ZEUS — Fichiers exclus du dépôt
+# NB : les règles de dossier sont ancrées à la racine (/nom/) pour ne pas
+#      exclure par erreur des skills portant un nom proche.
 # =============================================================================
 
 # --- Secrets (JAMAIS de commit) ---
-.env
-.env.*
-!.env.example
+/.env
+/.env.*
+!/.env.example
 *.key
 *.pem
 *.p12
 *.pfx
-credentials*.json
-*secret*
-*_token*
-auth.json
-hosts.yml
+/credentials*.json
+/auth.json
+/hosts.yml
 
 # --- Bases de données et état ---
 *.db
@@ -22,19 +22,18 @@ hosts.yml
 *.db-wal
 *.sqlite
 *.sqlite3
-state/
-sessions/
-memories/
-pending/
-pending_messages/
+/state/
+/sessions/
+/memories/
+/pending/
+/pending_messages/
 
 # --- Journaux ---
-logs/
+/logs/
 *.log
-gateway-starts.log
 
 # --- Caches et artefacts reconstruisibles ---
-cache/
+/cache/
 __pycache__/
 *.pyc
 *.pyo
@@ -43,32 +42,30 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 node_modules/
-dist/
-build/
-.venv/
-venv/
-installs/
-tools/
-hermes-agent/
-lsp/
+/dist/
+/build/
+/.venv/
+/venv/
+/installs/
+/tools/
+/hermes-agent/
+/lsp/
 
 # --- Données utilisateur ---
-attachments/
-images/
-image_cache/
-audio_cache/
-whatsapp/
-bot_relay/
+/attachments/
+/images/
+/image_cache/
+/audio_cache/
+/whatsapp/
+/bot_relay/
 
 # --- Divers ---
 *.bak
-*.bak.*
 *.tmp
 *.swp
 .DS_Store
 Thumbs.db
-backups/
-curator_state
-bundled_manifest
-.spawn-ledger.json
-spawn-ledger.json
+/backups/
+/curator_state
+/bundled_manifest
+/spawn-ledger.json
