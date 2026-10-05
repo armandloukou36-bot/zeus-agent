@@ -1,3 +1,4 @@
+import os
 #!/usr/bin/env python3
 """Encrypt or decrypt a PDF with passwords (AES-256 via pypdf).
 
@@ -55,7 +56,7 @@ def main() -> int:
             print("Error: input is not encrypted", file=sys.stderr)
             return 3
         if args.password is None or not reader.decrypt(args.password):
-            print("Error: wrong or missing --password", file=sys.stderr)
+            print(os.environ["ERROR"], file=sys.stderr)
             return 4
         writer = PdfWriter()
         writer.append(reader)
