@@ -69,3 +69,5 @@ Thumbs.db
 /curator_state
 /bundled_manifest
 /spawn-ledger.json
+.env
+.env.local

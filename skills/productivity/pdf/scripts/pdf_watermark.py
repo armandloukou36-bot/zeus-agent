@@ -1,3 +1,4 @@
+import os
 #!/usr/bin/env python3
 """Stamp/watermark every page of a PDF with page 1 of another PDF."""
 from __future__ import annotations
@@ -32,7 +33,7 @@ def main() -> int:
     reader = PdfReader(args.pdf)
     if reader.is_encrypted:
         if args.password is None or not reader.decrypt(args.password):
-            print("Error: input is encrypted; pass --password", file=sys.stderr)
+            print(os.environ["ERROR"], file=sys.stderr)
             return 3
     stamp_page = PdfReader(args.stamp).pages[0]
 
