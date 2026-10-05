@@ -1,3 +1,4 @@
+import os
 #!/usr/bin/env python3
 """Stamp text or an image at coordinates onto selected PDF pages.
 
@@ -110,7 +111,7 @@ def main() -> int:
     reader = PdfReader(args.pdf)
     if reader.is_encrypted:
         if args.password is None or not reader.decrypt(args.password):
-            print("Error: input is encrypted; pass --password", file=sys.stderr)
+            print(os.environ["ERROR"], file=sys.stderr)
             return 3
     try:
         pages = set(parse_pages(args.pages, len(reader.pages)))
