@@ -1,0 +1,74 @@
+# =============================================================================
+# ZEUS — Fichiers exclus du dépôt
+# =============================================================================
+
+# --- Secrets (JAMAIS de commit) ---
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+credentials*.json
+*secret*
+*_token*
+auth.json
+hosts.yml
+
+# --- Bases de données et état ---
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+state/
+sessions/
+memories/
+pending/
+pending_messages/
+
+# --- Journaux ---
+logs/
+*.log
+gateway-starts.log
+
+# --- Caches et artefacts reconstruisibles ---
+cache/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+node_modules/
+dist/
+build/
+.venv/
+venv/
+installs/
+tools/
+hermes-agent/
+lsp/
+
+# --- Données utilisateur ---
+attachments/
+images/
+image_cache/
+audio_cache/
+whatsapp/
+bot_relay/
+
+# --- Divers ---
+*.bak
+*.bak.*
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db
+backups/
+curator_state
+bundled_manifest
+.spawn-ledger.json
+spawn-ledger.json
